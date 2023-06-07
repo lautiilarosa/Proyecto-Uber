@@ -13,39 +13,16 @@ def createMap(archivo):
      print("MAPA CREADO CORRECTAMENTE")
     return map
     
-class GraphNode:
-  vertex = None
-  conectList = None
-  EdgesListofGraph = None
 
-  #PARA DJIKSTRA:
-  parent = None
-  #d; estimacion del camino mas corto
-  d = None
-  
-
-class NodoAsociado:
-  vertex1 = None
-  peso = None
-  asociadoA = None
-  
 def createGraph(LV,LA):
-  listAdyacencia = []
+  graph = {}
   for i in range(len(LV)):
-    Node = GraphNode()
-    Node.vertex = LV[i]
-    Node.conectList = []
-    listAdyacencia.append(Node)
-    
-  for i in range(len(LV)):
-    listAdyacencia[i].conectList = []
+    LV[i] = LV[i].lower()
+    connectvertex = {}
+    graph[LV[i]] = connectvertex
     for j in range(len(LA)):
+      LA[j][0] = LA[j][0].lower()
       if LV[i] == LA[j][0]:
-        NodoconectList = NodoAsociado()
-        NodoconectList.vertex1 = LA[j][1]
-        NodoconectList.peso = LA[j][2]
-        NodoconectList.asociadoA = LA[j][0]
-        listAdyacencia[i].conectList.append(NodoconectList)
-  listAdyacencia[0].EdgesListofGraph = LA
-  print("map created successfully")
-  return listAdyacencia
+        LA[j][1] = LA[j][1].lower()
+        connectvertex[LA[j][1]] = LA[j][2]
+  return graph      
