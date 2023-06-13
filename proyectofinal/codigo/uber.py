@@ -39,9 +39,13 @@ def deserializacion(archivo):
 #----------Otras funciones-----------
 #Función que pasa la dirección en string a estructura de datos
 def string_to_structure(string):
-    tuplas = re.findall(r'\((.*?),(.*?)\)',string)
-    structure = [(elem1, int(elem2)) for elem1, elem2 in tuplas]
+    aux1 = string.replace("<","").replace(">","")
+    aux2 = aux1.split()
+    structure = [aux2[0].split(","),aux2[1].split(",")]
+    structure[0][1] = int(structure[0][1])
+    structure[1][1] = int(structure[1][1])
     return structure
+
 
 def emptyfile(archivo):
     if os.path.getsize(archivo) == 0:
