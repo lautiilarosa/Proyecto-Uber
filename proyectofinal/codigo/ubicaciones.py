@@ -1,5 +1,6 @@
 import pickle
-from mapa import createGraph
+#from mapa import createGraph
+from elementos import calculoDistanciaAutosPersonas
 
 #Función que cheque si la dirección ingresada es válida
 def chequear_direccion(mapa,direccion):
@@ -46,27 +47,30 @@ def cargar_movil(elemento,direccion,monto,mapa,diccionario):
         list.append(direccion)
         list.append(monto)
         diccionario[elemento] = list
-        return diccionario
-    print("Dirección no válida")
-    return
+        
+        distancias = calculoDistanciaAutosPersonas(diccionario,mapa)
+        return distancias 
+    else:
+        print("Dirección no válida")
+        return
 
 
 
 
-vertices = ["E1","E2","E3","E4"]
-aristas = [["E1","E2",2],["E1","E3",8],["E2","E4",21],["E3","E4",4],["E2","E3",7],["E3","E2",7]]
+#vertices = ["E1","E2","E3","E4"]
+#aristas = [["E1","E2",2],["E1","E3",8],["E2","E4",21],["E3","E4",4],["E2","E3",7],["E3","E2",7]]
 
-grafo = createGraph(vertices,aristas)
-print(" ")
-print(grafo)
-print(" ")
-diccionario = {}
-d1 = [["E2",1],["E1",1]]
-d2 = [["E3",5],["E2",2]]
+#grafo = createGraph(vertices,aristas)
+#print(" ")
+#print(grafo)
+#print(" ")
+#diccionario = {}
+#d1 = [["E2",1],["E1",1]]
+#d2 = [["E3",5],["E2",2]]
 
 
-cargar_fija("H1",d1,grafo,diccionario)
-cargar_movil("P1",d2,10000,grafo,diccionario)
-print(diccionario)
+#cargar_fija("H1",d1,grafo,diccionario)
+#cargar_movil("P1",d2,10000,grafo,diccionario)
+#print(diccionario["p1"][0][0][0])
 
 

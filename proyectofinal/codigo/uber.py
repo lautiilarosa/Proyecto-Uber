@@ -7,6 +7,7 @@ from ubicaciones import cargar_fija,cargar_movil
 
 mi_Mapa = "miMapa.pkl" 
 ubicaciones_pickle = "ubicaciones.pkl"
+distancias_pickle = "distancias.pkl"
 
 #-----------Serializaciones y Deserializar-----------
 #Serializar Mapa
@@ -26,9 +27,11 @@ def serializacion_Esquinas_Ycalles(parametroRecibido):
     return mapa_creado
 
 #Serializar ubicaciones
-def serializacion_ubicaciones(archivo,diccionario):
+def serializacion_ubicaciones_distancias(archivo,diccionario):
     with open(archivo,"wb") as file:
         pickle.dump(diccionario,file)
+
+
 
 #Deserializar
 def deserializacion(archivo):
@@ -39,12 +42,10 @@ def deserializacion(archivo):
 #----------Otras funciones-----------
 #Función que pasa la dirección en string a estructura de datos
 def string_to_structure(string):
-    aux1 = string.replace("<","").replace(">","")
-    aux2 = aux1.split()
-    structure = [aux2[0].split(","),aux2[1].split(",")]
-    structure[0][1] = int(structure[0][1])
-    structure[1][1] = int(structure[1][1])
-    return structure
+    valores = re.findall(r'<(.*?)>', string)
+    valores_divididos = [valor.split(",") for valor in valores]
+    direccion = [tuple(valores) for valores in valores_divididos]
+    return direccion
 
 
 def emptyfile(archivo):
@@ -54,6 +55,10 @@ def emptyfile(archivo):
 
 
 #----------Comandos-----------
+if sys.argv[1] != "-create_map" and sys.argv[1] != "-load_fix_element" and sys.argv[1] != "-load_movil_element" and sys.argv[1] != "-create_trip":
+    print("Error")
+
+
 if sys.argv[1] == "-create_map":
     try:
         map_resultado = serializacion_Esquinas_Ycalles(sys.argv[2])
@@ -64,41 +69,44 @@ if sys.argv[1] == "-create_map":
 
 if sys.argv[1] == "-load_fix_element":
     try:
-        if emptyfile(mi_Mapa) == False:
+        if emptyfile(mi_Mapa) == True:
+            print("No hay nada cargado en el mapa")
+        else:
             with open(mi_Mapa,"rb") as file:
                 map = pickle.load(file)
 
+            ubicaciones = {}
             direction = string_to_structure(sys.argv[3])
             if emptyfile(ubicaciones_pickle) == False:
                 ubicaciones = deserializacion(ubicaciones_pickle)
-
+            
             oldsize = len(ubicaciones)
             cargar_fija(sys.argv[2],direction,map,ubicaciones)
             if oldsize != len(ubicaciones):
-                serializacion_ubicaciones(ubicaciones_pickle,ubicaciones)
-                print("Ubicación Insertada con éxito")
-        print("ERROR!!!")
-    except IndexError:
+                serializacion_ubicaciones_distancias(ubicaciones_pickle,ubicaciones)
+                print("Ubicación insertada con exito")
+    except:
         print("Parámetro no permitido")
 
 
 if sys.argv[1] == "-load_movil_element":
     try:
-        if emptyfile(mi_Mapa) == False:
+        if emptyfile(mi_Mapa) == True:
+            print("No hay nada cargado en el mapa")
+        else:
             with open(mi_Mapa,"rb") as file:
                 map = pickle.load(file)
 
+            ubicaciones = {}
             direction = string_to_structure(sys.argv[3])
             if emptyfile(ubicaciones_pickle) == False:
                 ubicaciones = deserializacion(ubicaciones_pickle)
-
-            oldsize = len(ubicaciones)
-            cargar_movil(sys.argv[2],direction,sys.argv[4],map,ubicaciones)
-            if oldsize != len(ubicaciones):
-                serializacion_ubicaciones(ubicaciones_pickle,ubicaciones)
-                print("Ubicación Insertada con éxito")
-        print("ERROR!!!")
-    except IndexError:
+            
+            distancias = cargar_movil(sys.argv[2],direction,sys.argv[4],map,ubicaciones)
+            if distancias != None:
+                serializacion_ubicaciones_distancias(ubicaciones_pickle,ubicaciones)
+                serializacion_ubicaciones_distancias(distancias_pickle,distancias)
+    except:
         print("Parámetro no permitido")
 
 
