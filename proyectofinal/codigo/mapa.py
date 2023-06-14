@@ -2,50 +2,55 @@ import math
 import pickle
 import sys 
 import ast
+import re
  
+class graphnode:
+  distance = None
+  parent = None
+  color = None
+
+#Deserializar el archivo pickle
 def createMap(archivo):
-    print("A")
     with open(archivo, "rb") as pickle_f:
-     listaEsquinas = eval(pickle.load(pickle_f))
-     listaAristas = ast.literal_eval(pickle.load(pickle_f))
+     datosArchivo = pickle.load(pickle_f)
+     datosArchivo2 = pickle.load(pickle_f)
+     if datosArchivo != "" and isinstance(datosArchivo, str): 
+       datosArchivo = str(datosArchivo)
+
+       datosArchivo = datosArchivo[3:]
+       datosArchivo = datosArchivo.replace("{","")
+       datosArchivo = datosArchivo.replace("}","")
+       datosArchivo = datosArchivo.strip()
+       
+       listaEsquinas = datosArchivo.split(",")
+
+       datosArchivo2 = str(datosArchivo2)
+ 
+       # Obtener los valores entre < y >
+  
+       valores = re.findall(r'<([^>]*)>', datosArchivo2)
+
+       # Dividir cada valor por comas y crear una lista de tuplas
+       listaAristas = [tuple(int(valor) if valor.isdigit() else valor for valor in valor.split(',')) for valor in valores]
+     else:
+       print("mapa vacio")
+       return 
      
      map = createGraph(listaEsquinas, listaAristas)
-     print("MAPA CREADO CORRECTAMENTE")
     return map
     
-class GraphNode:
-  vertex = None
-  conectList = None
-  EdgesListofGraph = None
-
-  #PARA DJIKSTRA:
-  parent = None
-  #d; estimacion del camino mas corto
-  d = None
-  
-
-class NodoAsociado:
-  vertex1 = None
-  peso = None
-  asociadoA = None
-  
+#crear el grafo 
 def createGraph(LV,LA):
-  listAdyacencia = []
+  graph = {}
   for i in range(len(LV)):
-    Node = GraphNode()
-    Node.vertex = LV[i]
-    Node.conectList = []
-    listAdyacencia.append(Node)
-    
-  for i in range(len(LV)):
-    listAdyacencia[i].conectList = []
+    nodo = graphnode()
+    LV[i] = LV[i].lower()
+    connectvertex = {}
+    graph[LV[i]] = connectvertex
+    connectvertex["Node"] = nodo
     for j in range(len(LA)):
+      #LA[j][0] = LA[j][0].lower()
       if LV[i] == LA[j][0]:
-        NodoconectList = NodoAsociado()
-        NodoconectList.vertex1 = LA[j][1]
-        NodoconectList.peso = LA[j][2]
-        NodoconectList.asociadoA = LA[j][0]
-        listAdyacencia[i].conectList.append(NodoconectList)
-  listAdyacencia[0].EdgesListofGraph = LA
-  print("map created successfully")
-  return listAdyacencia
+        #LA[j][1] = LA[j][1].lower()
+        connectvertex[LA[j][1]] = LA[j][2]
+  return graph      
