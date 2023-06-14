@@ -4,8 +4,8 @@ from elementos import calculoDistanciaAutosPersonas
 
 #Función que cheque si la dirección ingresada es válida
 def chequear_direccion(mapa,direccion):
-    direccion[0][0] = direccion[0][0].lower()
-    direccion[1][0] = direccion[1][0].lower()
+    #direccion[0][0] = direccion[0][0].lower()
+    #direccion[1][0] = direccion[1][0].lower()
     if direccion[0][0] in mapa:
         x = mapa[direccion[0][0]]
         if direccion[1][0] in x:
@@ -31,6 +31,7 @@ def cargar_fija(elemento,direccion,mapa,diccionario):
     
     if chequear_direccion(mapa,direccion) == True:
         diccionario[elemento] = direccion
+        print("CARGANDO")
         return diccionario
     print("Dirección no válida")
     return
