@@ -9,14 +9,13 @@ class nodeDictionary:
     
 
 
-def calculoDistanciaAutosPersonas(listadoElementos, mapa):
-    dicAutos = {}
+def calculoDistanciaAutosPersonas(listadoElementos, mapa, dicAutos):
     #un doble for lamentablemente :( ¿se podra mejorar?
     for key in listadoElementos:
-        if key[0] == "C":
+        if key[0] == "c":
             dicAutos[key] = {}
             for keyP in listadoElementos:
-              if keyP[0] == "P":
+              if keyP[0] == "p":
                 distanceValue = calculoDistanciaCA(listadoElementos, key, keyP, mapa)
                 dicAutos[key][keyP] = distanceValue 
     return dicAutos

@@ -143,13 +143,35 @@ if sys.argv[1] == "-load_movil_element":
             ubicaciones = {}
             direction = string_to_structure(sys.argv[3])
             
-            if emptyfile(ubicaciones_pickle) == False:
+            if os.path.exists(ubicaciones_pickle) == False:
+                with open(ubicaciones_pickle,"wb") as archivo:
+                    print("")
+
+
+            if emptyfile2(ubicaciones_pickle) == False:
                 ubicaciones = deserializacion(ubicaciones_pickle)
+
             
-            distancias = cargar_movil(sys.argv[2],direction,sys.argv[4],map,ubicaciones)
+            dicAutos = {}
+
+            if os.path.exists(distancias_pickle) == False:
+                with open(distancias_pickle, "wb") as archive:
+                    print("")
+            
+            if emptyfile2(distancias_pickle) == False:
+                dicAutos = deserializacion(distancias_pickle)
+
+            distancias = cargar_movil(sys.argv[2],direction,sys.argv[4],map,ubicaciones, dicAutos)
+            print(ubicaciones)
+
             if distancias != None:
                 serializacion_ubicaciones_distancias(ubicaciones_pickle,ubicaciones)
                 serializacion_ubicaciones_distancias(distancias_pickle,distancias)
+            
+            with open(distancias_pickle,"rb") as archivopkl:
+                dicDistance = pickle.load(archivopkl)
+                
+                print(dicDistance)
     except:
         print("Parámetro no permitido")
 

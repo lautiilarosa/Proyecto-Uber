@@ -37,7 +37,7 @@ def cargar_fija(elemento,direccion,mapa,diccionario):
     return
 
 #función que carga ubicaciones móviles
-def cargar_movil(elemento,direccion,monto,mapa,diccionario):
+def cargar_movil(elemento,direccion,monto,mapa,diccionario,dicAutos):
     elemento = elemento.lower()
     if elemento in diccionario:
         print("Ubicación ya existente")
@@ -49,7 +49,7 @@ def cargar_movil(elemento,direccion,monto,mapa,diccionario):
         list.append(monto)
         diccionario[elemento] = list
         
-        distancias = calculoDistanciaAutosPersonas(diccionario,mapa)
+        distancias = calculoDistanciaAutosPersonas(diccionario,mapa, dicAutos)
         return distancias 
     else:
         print("Dirección no válida")
