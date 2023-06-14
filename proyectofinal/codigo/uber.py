@@ -2,8 +2,11 @@ import  pickle
 import sys
 import re
 import os
+import math
 from mapa import createMap
-from ubicaciones import cargar_fija,cargar_movil
+from ubicaciones import cargar_fija,cargar_movil,chequear_direccion
+from trip import calculoCaminoMasCorto
+from elementos import calculoDistanciaAutosPersonas
 
 mi_Mapa = "miMapa.pkl" 
 ubicaciones_pickle = "ubicaciones.pkl"
@@ -32,7 +35,6 @@ def serializacion_ubicaciones_distancias(archivo,diccionario):
         pickle.dump(diccionario,file)
 
 
-
 #Deserializar
 def deserializacion(archivo):
     with open(archivo,"rb") as file:
@@ -40,6 +42,7 @@ def deserializacion(archivo):
     return objeto    
 
 #----------Otras funciones-----------
+
 #Función que pasa la dirección en string a estructura de datos
 def string_to_structure(string):
     valores = re.findall(r'<(.*?)>', string)
@@ -49,9 +52,104 @@ def string_to_structure(string):
 
 
 def emptyfile(archivo):
-    if os.path.getsize(archivo) == 0:
+    dato = deserializacion(archivo)
+    if dato == "":
         return True
     return False
+
+#Función que verifica que los argumentos del createtrip sean validos
+def verificar_argumentos(persona,direccion_elemento,map,diccionario):
+    if direccion_elemento[0] == "<":
+        direccion = string_to_structure(direccion_elemento)
+        if (persona in map) and chequear_direccion(map,direccion) == True:
+            direccionpersona = diccionario[persona]
+            shortpath = calculoCaminoMasCorto(direccion,map,direccionpersona)
+            return shortpath
+        return 
+    else:
+        direccion_elemento = direccion_elemento.lower
+        if (persona in map) and (direccion_elemento in diccionario):
+            direccionpersona = diccionario[persona]
+            direccionlugar = diccionario[direccion_elemento]
+            shortpath = calculoCaminoMasCorto(direccionlugar,map,direccionpersona)
+            return shortpath
+        return 
+    
+#Función que arma el ranking de los autos
+def ranking(distancias,persona,ubicaciones):
+    rankingdiccionariov1 = {}
+    for auto in distancias:
+        diccionario = distancias[auto]
+        if persona in diccionario:
+            if diccionario[persona] != math.inf:
+                rankingdiccionariov1[auto] = diccionario[persona]
+
+    #Ordenar el diccionario
+    rankingdiccionariov1 = dict(sorted(rankingdiccionariov1.items(),key=lambda x:x[1]))
+    if len(rankingdiccionariov1) == 0: return
+    
+    #calcular el coste final
+    for auto in rankingdiccionariov1:
+        costefinal = (rankingdiccionariov1[auto] + ubicaciones[auto][1])/4
+        rankingdiccionariov1[auto] = costefinal
+
+    i = 0
+    ranking_final = {}
+    for claves in rankingdiccionariov1:
+        ranking_final[claves] = rankingdiccionariov1[claves]
+        i += 1
+        if i == 3:
+            break
+    return ranking_final 
+
+
+def cuadrointeractivo(ubicaciones,distancias,persona,elemento_direccion,ranking,camino,mapa,ubicaciones_pickle,distancia_pickle):
+    print("")
+    print("----------Bienvenido ",persona,"----------")
+    print("")
+    #Imprimir los autos ordenados de menor a mayor en cuanto a la distancia
+    print("Este es el ranking de los autos:")
+    i = 1
+    for clave in ranking:
+        print(i,": ",clave,"y el coste del viaje: ",ranking[clave])
+    
+    #Imprimir el recorrido que hara cualquiera de los autos
+    print("")
+    print("Este es el camino que tomará el auto para dirigirse a la dirección:")
+    print("(",end=" ")
+    for i in range(0,len(camino)):
+        if i == len(camino)-1:
+            print(camino[i],end=" ")
+        else:
+            print(camino[i],end=" -> ")
+    print(")")
+    print("")
+
+    #Verificar que el usuario acepte y realizar los cambios y serializarlos en los archivos pickle
+    entrada = input("¿Acepta el viaje? Ingrese si/no: ")
+    entrada = entrada.lower
+    while entrada != "si" and entrada != "no":
+        entrada = input("Respuesta incorrecta por favor intente de vuelta: ")
+        entrada = entrada.lower
+    
+    if entrada == "no":
+        print("Okey,continue viajando con nosotros !")
+        return
+    
+    if elemento_direccion[0] == "<":
+        direccion = string_to_structure(elemento_direccion)
+    else:
+        direccion = ubicaciones[elemento_direccion]
+    
+    auto = next(iter(ranking))
+    ubicaciones[persona][1] = ubicaciones[persona][1] - ranking[auto]
+    ubicaciones[persona][0] = direccion
+    ubicaciones[auto][0] = direccion
+    distancias = calculoDistanciaAutosPersonas(ubicaciones,mapa)
+    serializacion_ubicaciones_distancias(ubicaciones_pickle,ubicaciones)
+    serializacion_ubicaciones_distancias(distancia_pickle,distancias)
+    return
+
 
 
 #----------Comandos-----------
@@ -85,7 +183,7 @@ if sys.argv[1] == "-load_fix_element":
             if oldsize != len(ubicaciones):
                 serializacion_ubicaciones_distancias(ubicaciones_pickle,ubicaciones)
                 print("Ubicación insertada con exito")
-    except:
+    except IndexError:
         print("Parámetro no permitido")
 
 
@@ -106,7 +204,30 @@ if sys.argv[1] == "-load_movil_element":
             if distancias != None:
                 serializacion_ubicaciones_distancias(ubicaciones_pickle,ubicaciones)
                 serializacion_ubicaciones_distancias(distancias_pickle,distancias)
-    except:
+    except IndexError:
         print("Parámetro no permitido")
 
+
+if sys.argv[1] == "-create_trip":
+    try:
+        if emptyfile(mi_Mapa) == True:
+            print("No hay nada cargado en el mapa")
+        else:
+            map = deserializacion(mi_Mapa)
+            ubicaciones = deserializacion(mi_Mapa)
+            sys.argv[2] = sys.argv[2].lower
+            camino = verificar_argumentos(sys.argv[2],sys.argv[3],map,ubicaciones)
+            #Si es igual a none no podemos ir de la persona a la dirección o los argumentos fueron mal ingresados
+            if camino != None:
+                distanciasautos = deserializacion(distancias_pickle)
+                ranking = ranking(distanciasautos,sys.argv[2],ubicaciones)
+                #Si es igual a none quiere decir que ningún auto se puede dirigir a la persona
+                if ranking != None:
+                    cuadrointeractivo(ubicaciones,distancias,sys.argv[2],sys.argv[3],ranking,camino,map)
+                else:
+                    print("ERROR!")
+            else:
+                print("ERROR!")
+    except IndexError:
+        print("Parámetro no permitido")                 
 
