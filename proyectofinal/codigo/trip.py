@@ -1,29 +1,7 @@
 from elementos import Djikstra
+from ubicaciones import chequear_direccion
 import math
-#Verificar que existe la persona, y que exista tambien el lugar al que quiere ir
-#Datos a necesitar: Mapa y diccionario de elementos
-#fijarme si se trata de UBICACION o si es ya direccion
-
-def chequear_direccion(mapa,direccion):
-    direccion[0][0] = direccion[0][0].lower()
-    direccion[1][0] = direccion[1][0].lower()
-    if direccion[0][0] in mapa:
-        x = mapa[direccion[0][0]]
-        if direccion[1][0] in x:
-            peso1 = x[direccion[1][0]]
-            peso2 = direccion[0][1] + direccion[1][1]
-            if peso1 == peso2: 
-                return True
-
-        if direccion[1][0] in mapa:
-            y = mapa[direccion[1][0]]
-            if direccion[0][0] in y:
-                peso1 = y[direccion[0][0]]
-                peso2 = direccion[0][1] + direccion[1][1]
-                if peso1 == peso2: 
-                    return True
-    return False     
-
+     
 def verificacionDobleMano(Mapa, primeraEsquina, segundaEsquina):
     if segundaEsquina in Mapa[primeraEsquina]:
         if primeraEsquina in Mapa[segundaEsquina]:

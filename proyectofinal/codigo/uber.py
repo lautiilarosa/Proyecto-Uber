@@ -288,8 +288,7 @@ if sys.argv[1] == "-create_trip":
                 if camino == -1:
                     print("¡ya estamos aqui!")
                 else:
-                    distanciasautos = deserializacion(distancias_pickle)
-                    ranking = ranking(distanciasautos,sys.argv[2],ubicaciones)
+                    ranking = ranking(distancias,sys.argv[2],ubicaciones)
                 #Si es igual a none quiere decir que ningún auto se puede dirigir a la persona
                     if ranking != None:
                        cuadrointeractivo(ubicaciones,distancias,sys.argv[2],sys.argv[3],ranking,camino,map,ubicaciones_pickle,distancias_pickle)
@@ -299,4 +298,3 @@ if sys.argv[1] == "-create_trip":
                 print("ERROR!")
     except IndexError:
         print("Parámetro no permitido")                 
-
