@@ -7,7 +7,7 @@ import re
 class graphnode:
   distance = None
   parent = None
-  color = None
+  esquina = None
 
 #Deserializar el archivo pickle
 def createMap(archivo):
@@ -38,7 +38,7 @@ def createMap(archivo):
      
      map = createGraph(listaEsquinas, listaAristas)
     return map
-    
+
 #crear el grafo 
 def createGraph(LV,LA):
   graph = {}
@@ -49,8 +49,6 @@ def createGraph(LV,LA):
     graph[LV[i]] = connectvertex
     connectvertex["Node"] = nodo
     for j in range(len(LA)):
-      #LA[j][0] = LA[j][0].lower()
       if LV[i] == LA[j][0]:
-        #LA[j][1] = LA[j][1].lower()
         connectvertex[LA[j][1]] = LA[j][2]
   return graph      
