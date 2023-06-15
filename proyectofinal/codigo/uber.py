@@ -210,8 +210,9 @@ if sys.argv[1] == "-create_map":
 #Cargar elemento fijo
 if sys.argv[1] == "-load_fix_element":
     try:
-        if emptyfile(mi_Mapa_Grafo) == True:
-            print("No hay nada cargado en el mapa")
+        if os.path.exists(mi_Mapa_Grafo) == False:
+            #En caso de que el mapa aun no ha sido cargado
+            print("No hay un mapa")
         else:
             with open(mi_Mapa_Grafo,"rb") as file:
                 map = pickle.load(file)
@@ -230,7 +231,6 @@ if sys.argv[1] == "-load_fix_element":
             if oldsize != len(ubicaciones):
                 serializacion_ubicaciones_distancias(ubicaciones_pickle,ubicaciones)
                 print("Ubicación insertada con exito")
-
     except IndexError:
         print("Parámetro no permitido")
 
@@ -238,8 +238,9 @@ if sys.argv[1] == "-load_fix_element":
 #Cargar elemento movil
 if sys.argv[1] == "-load_movil_element":
     try:
-        if emptyfile(mi_Mapa_Grafo) == True:
-            print("No hay nada cargado en el mapa")
+        if os.path.exists(mi_Mapa_Grafo) == False:
+            #En caso de que el mapa aun no ha sido cargado
+            print("No hay un mapa")
         else:
             with open(mi_Mapa_Grafo,"rb") as file:
                 map = pickle.load(file)
@@ -275,8 +276,9 @@ if sys.argv[1] == "-load_movil_element":
 #Crear viaje
 if sys.argv[1] == "-create_trip":
     try:
-        if emptyfile(mi_Mapa_Grafo) == True:
-            print("No hay nada cargado en el mapa")
+        if os.path.exists(mi_Mapa_Grafo) == False:
+            #En caso de que el mapa aun no ha sido cargado
+            print("No hay un mapa")
         else:
             map = deserializacion(mi_Mapa_Grafo)
             ubicaciones = deserializacion(ubicaciones_pickle)
@@ -297,4 +299,5 @@ if sys.argv[1] == "-create_trip":
             else:
                 print("ERROR!")
     except IndexError:
-        print("Parámetro no permitido")                 
+        print("Parámetro no permitido")     
+
