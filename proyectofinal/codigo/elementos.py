@@ -164,8 +164,6 @@ def calculoDistanciaCA(diccionarioElementos, keyAuto, keyPersona, Mapa):
       distancia = diccionarioElementos[keyAuto][0][1][1] - distanciaPersonaSegundaEsquina
       if distancia >= 0:
         return distancia
-      else: 
-        return math.inf
     
     if primeraEsquina in Mapa[segundaEsquina]:
       if primeraEsquina == primeraEsquinaPersona:
@@ -176,9 +174,6 @@ def calculoDistanciaCA(diccionarioElementos, keyAuto, keyPersona, Mapa):
       distancia = diccionarioElementos[keyAuto][0][0][1] - distanciaPersonaPrimeraEsquina
       if distancia >= 0:
         return distancia
-      else:
-        return math.inf
-    
         
   
   listaEsquinaC = verificacionDobleMano(Mapa, primeraEsquina, segundaEsquina)

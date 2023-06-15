@@ -72,7 +72,12 @@ def verificar_argumentos(persona,direccion_elemento,map,diccionario):
         direccion = string_to_structure(direccion_elemento)
         if (persona in diccionario) and chequear_direccion(map,direccion) == True:
             direccionpersona = diccionario[persona][0]
+            #caso en que la persona este pidiendo viaje a la direccion donde esta (si, muy vago):
+            if (direccionpersona[0] == direccion[0] or direccionpersona[0] == direccion[1]) and (direccionpersona[1] == direccion[0] or direccionpersona[1] == direccion[1]):
+                return -1
             shortpath = calculoCaminoMasCorto(direccion,map,direccionpersona)
+            if shortpath == None:
+                return None
             return shortpath
         return 
     else:
@@ -80,20 +85,25 @@ def verificar_argumentos(persona,direccion_elemento,map,diccionario):
         if (persona in diccionario) and (direccion_elemento in diccionario):
             direccionpersona = diccionario[persona][0]
             direccionlugar = diccionario[direccion_elemento]
+            
+            if (direccionpersona[0] == direccionlugar[0] or direccionpersona[0] == direccionlugar[1]) and (direccionpersona[1] == direccionlugar[0] or direccionpersona[1] == direccionlugar[1]):
+                return -1
             shortpath = calculoCaminoMasCorto(direccionlugar,map,direccionpersona)
+            if shortpath == None:
+                return None
             return shortpath
         return 
 
 
 #Función que arma el ranking de los autos
 def ranking(distancias,persona,ubicaciones):
+    
     rankingdiccionariov1 = {}
     for auto in distancias:
         diccionario = distancias[auto]
         if persona in diccionario:
             if diccionario[persona] != math.inf:
                 rankingdiccionariov1[auto] = diccionario[persona]
-
     #Ordenar el diccionario
     rankingdiccionariov1 = dict(sorted(rankingdiccionariov1.items(),key=lambda x:x[1]))
     if len(rankingdiccionariov1) == 0: return
@@ -184,11 +194,15 @@ if sys.argv[1] != "-create_map" and sys.argv[1] != "-load_fix_element" and sys.a
 #Cargar mapa
 if sys.argv[1] == "-create_map":
     try:
-        map_resultado = serializacion_Esquinas_Ycalles(sys.argv[2])
-        print("map created succesfully")
-        print(" ")
-        with open(mi_Mapa_Grafo, "wb") as pickle_f:
-            pickle.dump(map_resultado, pickle_f)
+        if os.path.exists(sys.argv[2]) == False:
+            #En caso de que el fichero (el .txt) no se encuentre.
+            print("No fue posible cargar el mapa")
+        else:
+            map_resultado = serializacion_Esquinas_Ycalles(sys.argv[2])
+            print("map created succesfully")
+            print(" ")
+            with open(mi_Mapa_Grafo, "wb") as pickle_f:
+              pickle.dump(map_resultado, pickle_f)
     except IndexError:
         print("Parámetro no permitido")
 
@@ -216,8 +230,7 @@ if sys.argv[1] == "-load_fix_element":
             if oldsize != len(ubicaciones):
                 serializacion_ubicaciones_distancias(ubicaciones_pickle,ubicaciones)
                 print("Ubicación insertada con exito")
-            print(" ")
-            print(ubicaciones)
+
     except IndexError:
         print("Parámetro no permitido")
 
@@ -272,15 +285,16 @@ if sys.argv[1] == "-create_trip":
             camino = verificar_argumentos(sys.argv[2],sys.argv[3],map,ubicaciones)
             #Si es igual a none no podemos ir de la persona a la dirección o los argumentos fueron mal ingresados
             if camino != None:
-                distanciasautos = deserializacion(distancias_pickle)
-                ranking = ranking(distanciasautos,sys.argv[2],ubicaciones)
-                #Si es igual a none quiere decir que ningún auto se puede dirigir a la persona
-                if ranking != None:
-                    cuadrointeractivo(ubicaciones,distancias,sys.argv[2],sys.argv[3],ranking,camino,map,ubicaciones_pickle,distancias_pickle)
+                if camino == -1:
+                    print("¡ya estamos aqui!")
                 else:
-                    print("ERROR!")
+                    ranking = ranking(distancias,sys.argv[2],ubicaciones)
+                #Si es igual a none quiere decir que ningún auto se puede dirigir a la persona
+                    if ranking != None:
+                       cuadrointeractivo(ubicaciones,distancias,sys.argv[2],sys.argv[3],ranking,camino,map,ubicaciones_pickle,distancias_pickle)
+                    else:
+                       print("ERROR!")
             else:
                 print("ERROR!")
     except IndexError:
         print("Parámetro no permitido")                 
-
