@@ -7,7 +7,7 @@ import re
 class graphnode:
   distance = None
   parent = None
-  color = None
+  esquina = None
 
 #Deserializar el archivo pickle
 def createMap(archivo):
